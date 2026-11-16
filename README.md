@@ -31,7 +31,7 @@ Modern luxury streetwear e-commerce storefront and digital lookbook for **ORRA B
    cp .env.example .env
    ```
 
-   Ensure `firebase-applet-config.json` contains your Firebase project configuration.
+   Ensure `firebase-applet-config.json` contains your Firebase project configuration, and enable **Anonymous** sign-in in Firebase Authentication. Checkout creates an anonymous Firebase user automatically so customers can place orders without signing in with Google.
 
 3. **Run the development server**
 

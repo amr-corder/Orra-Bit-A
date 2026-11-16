@@ -939,7 +939,6 @@ export default function App() {
         cartItems={cart}
         storeSettings={effectiveSettings}
         currentUser={currentUser}
-        onSignIn={handleSignIn}
         onOrderCompleted={() => setCart([])}
         language={language}
       />

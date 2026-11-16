@@ -515,10 +515,6 @@ export interface StorefrontCopy {
     deliveryNotesLabel: string;
     deliveryNotesPlaceholder: string;
     savePrefs: string;
-    googlePrompt: string;
-    signingIn: string;
-    signInGoogle: string;
-    openNewTab: string;
     savingOrder: string;
     confirmCod: string;
     confirmOrder: string;
@@ -532,7 +528,6 @@ export interface StorefrontCopy {
     included: string;
     total: string;
     certificateNote: string;
-    signInRequiredError: string;
     orderSaveFailedError: string;
     orderSaveFailedPrefix: string;
   };
@@ -808,11 +803,6 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       deliveryNotesLabel: 'Delivery Notes (Optional)',
       deliveryNotesPlaceholder: 'Building floor, apartment, or preferred time',
       savePrefs: 'Save shipping preferences for future orders',
-      googlePrompt:
-        'To permanently and securely save your order in the database, please verify your identity with Google:',
-      signingIn: 'Signing in...',
-      signInGoogle: 'Sign in with Google to confirm order',
-      openNewTab: 'Open site in a new tab to sign in',
       savingOrder: 'Saving order to database...',
       confirmCod: 'Confirm COD Order',
       confirmOrder: 'Confirm Order',
@@ -826,8 +816,6 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       included: 'INCLUDED',
       total: 'Total',
       certificateNote: 'Includes archival travel box and numbered certificate',
-      signInRequiredError:
-        'Please sign in with Google first to save your order permanently to the database.',
       orderSaveFailedError: 'Failed to save order to database. Please try again.',
       orderSaveFailedPrefix: 'Failed to save order:'
     },
@@ -1100,11 +1088,6 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       deliveryNotesLabel: 'ملاحظات التوصيل (اختياري)',
       deliveryNotesPlaceholder: 'الدور، الشقة، أو الوقت المفضل للتوصيل',
       savePrefs: 'حفظ بيانات الشحن للطلبات القادمة',
-      googlePrompt:
-        'لتسجيل وحفظ طلبك في قاعدة البيانات بشكل دائم وآمن، يرجى تأكيد هويتك عبر Google:',
-      signingIn: 'جاري تسجيل الدخول...',
-      signInGoogle: 'تسجيل الدخول عبر Google لتأكيد الطلب',
-      openNewTab: 'فتح الموقع في تبويب مستقل لتسجيل الدخول',
       savingOrder: 'جاري حفظ الطلب في قاعدة البيانات...',
       confirmCod: 'تأكيد طلب الدفع عند الاستلام',
       confirmOrder: 'تأكيد الطلب',
@@ -1118,7 +1101,6 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       included: 'شامل',
       total: 'الإجمالي',
       certificateNote: 'يشمل صندوق الحفظ الأرشيفي وشهادة الأصالة المرقّمة',
-      signInRequiredError: 'يرجى تسجيل الدخول بحساب Google أولاً لحفظ طلبك بشكل دائم في قاعدة البيانات.',
       orderSaveFailedError: 'فشل حفظ الطلب في قاعدة البيانات. يرجى المحاولة مرة أخرى.',
       orderSaveFailedPrefix: 'فشل حفظ الطلب:'
     },

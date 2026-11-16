@@ -12,13 +12,10 @@ import {
   ArrowRight,
   Copy,
   AlertCircle,
-  Loader2,
-  LogIn,
-  ExternalLink
+  Loader2
 } from 'lucide-react';
 import { CartItem, PaymentMethod, StoreSettings } from '../types';
 import { createOrderInDb } from '../services/firestoreService';
-import { formatFirebaseAuthError } from '../firebase';
 import {
   Language,
   STORE_STRINGS,
@@ -33,7 +30,6 @@ interface CheckoutModalProps {
   cartItems: CartItem[];
   storeSettings: StoreSettings;
   currentUser: User | null;
-  onSignIn: () => Promise<void>;
   onOrderCompleted: () => void;
   language: Language;
 }
@@ -44,7 +40,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   cartItems,
   storeSettings,
   currentUser,
-  onSignIn,
   onOrderCompleted,
   language
 }) => {
@@ -73,8 +68,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     saveInfo: true
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSigningIn, setIsSigningIn] = useState(false);
-  const [isPopupAuthIssue, setIsPopupAuthIssue] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState('');
   const [settledTotal, setSettledTotal] = useState(0);
@@ -123,31 +116,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setTimeout(() => setCopiedField(null), 1800);
   };
 
-  const handleGoogleSignIn = async () => {
-    setIsSigningIn(true);
-    setSubmitError(null);
-    setIsPopupAuthIssue(false);
-    try {
-      await onSignIn();
-    } catch (err) {
-      const formatted = formatFirebaseAuthError(err);
-      setIsPopupAuthIssue(formatted.isPopupIssue);
-      setSubmitError(formatted.message);
-    } finally {
-      setIsSigningIn(false);
-    }
-  };
-
   const handleCompleteOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
 
     if (cartItems.length === 0) {
-      return;
-    }
-
-    if (!currentUser) {
-      setSubmitError(t.signInRequiredError);
       return;
     }
 
@@ -721,46 +694,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       </label>
                     </div>
 
-                    {!currentUser && (
-                      <div className="p-4 border border-[#0A0A0A] bg-[#F9F9F9] space-y-3">
-                        <p className="text-[12px] text-[#0A0A0A] leading-relaxed">
-                          {t.googlePrompt}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={handleGoogleSignIn}
-                          disabled={isSigningIn}
-                          className="h-10 px-4 bg-[#0A0A0A] text-[#FFFFFF] text-[11px] font-mono uppercase tracking-[0.08em] hover:bg-[#27272A] transition-colors flex items-center gap-2 disabled:opacity-50"
-                        >
-                          {isSigningIn ? (
-                            <Loader2 size={14} className="animate-spin" />
-                          ) : (
-                            <LogIn size={14} />
-                          )}
-                          <span>
-                            {isSigningIn ? t.signingIn : t.signInGoogle}
-                          </span>
-                        </button>
-                      </div>
-                    )}
-
                     {submitError && (
                       <div className="p-3 border border-[#ba1a1a] bg-[#FFF5F5] text-[#ba1a1a] text-[12px] space-y-2.5">
                         <div className="flex items-start gap-2">
                           <AlertCircle size={15} className="shrink-0 mt-0.5" />
                           <span>{submitError}</span>
                         </div>
-                        {isPopupAuthIssue && typeof window !== 'undefined' && (
-                          <a
-                            href={window.location.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-9 px-3 border border-[#ba1a1a] bg-[#FFFFFF] text-[#0A0A0A] text-[11px] font-mono uppercase hover:bg-[#0A0A0A] hover:text-[#FFFFFF] hover:border-[#0A0A0A] transition-colors inline-flex items-center gap-2"
-                          >
-                            <ExternalLink size={13} />
-                            <span>{t.openNewTab}</span>
-                          </a>
-                        )}
                       </div>
                     )}
 

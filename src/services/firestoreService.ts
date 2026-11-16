@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   Unsubscribe
 } from 'firebase/firestore';
+import { signInAnonymously } from 'firebase/auth';
 import { db, auth, handleFirestoreError, OperationType, ROOT_ADMIN_EMAIL } from '../firebase';
 import { PRODUCTS as INITIAL_PRODUCTS, LOOKBOOK_SPREADS as INITIAL_LOOKBOOKS } from '../data/products';
 import {
@@ -424,10 +425,7 @@ export async function saveStoreSettingsInDb(settings: StoreSettings): Promise<vo
 }
 
 export async function createOrderInDb(order: Omit<Order, 'id' | 'userId' | 'status' | 'createdAt' | 'updatedAt'>): Promise<string> {
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    throw new Error('Authentication required to persist order in database.');
-  }
+  const currentUser = auth.currentUser ?? (await signInAnonymously(auth)).user;
   const orderId = sanitizeId(`${order.orderNumber}-${Date.now()}`);
   const path = `orders/${orderId}`;
 
