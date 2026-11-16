@@ -13,7 +13,7 @@ Modern luxury streetwear e-commerce storefront and digital lookbook for **ORRA B
 ## Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS v4, Lucide Icons, Motion
-- **Database & Auth**: Firebase (Cloud Firestore + Google Auth) & Supabase Auth
+- **Database & Auth**: Firebase (Cloud Firestore catalog and settings) & Supabase (checkout orders and admin authentication)
 
 ## Getting Started
 
@@ -31,7 +31,7 @@ Modern luxury streetwear e-commerce storefront and digital lookbook for **ORRA B
    cp .env.example .env
    ```
 
-   Ensure `firebase-applet-config.json` contains your Firebase project configuration, and enable **Anonymous** sign-in in Firebase Authentication. Checkout creates an anonymous Firebase user automatically so customers can place orders without signing in with Google.
+   Ensure `firebase-applet-config.json` contains your Firebase project configuration and configure the Supabase URL and publishable key. Run [`supabase/orders.sql`](./supabase/orders.sql) in the Supabase SQL Editor to enable shared order storage and admin-only order access. Admins must sign in through Supabase with the authorized email or an `app_metadata.role` of `admin`. Checkout saves orders to Supabase without requiring Firebase sign-in.
 
 3. **Run the development server**
 

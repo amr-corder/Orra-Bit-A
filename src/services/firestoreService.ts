@@ -6,7 +6,6 @@ import {
   deleteDoc,
   onSnapshot,
   query,
-  where,
   orderBy,
   getDocFromServer,
   getDoc,
@@ -14,15 +13,12 @@ import {
   serverTimestamp,
   Unsubscribe
 } from 'firebase/firestore';
-import { signInAnonymously } from 'firebase/auth';
-import { db, auth, handleFirestoreError, OperationType, ROOT_ADMIN_EMAIL } from '../firebase';
+import { db, handleFirestoreError, OperationType, ROOT_ADMIN_EMAIL } from '../firebase';
 import { PRODUCTS as INITIAL_PRODUCTS, LOOKBOOK_SPREADS as INITIAL_LOOKBOOKS } from '../data/products';
 import {
   Product,
   LookbookSpread,
-  StoreSettings,
-  Order,
-  OrderStatus
+  StoreSettings
 } from '../types';
 
 export const DEFAULT_STORE_SETTINGS: StoreSettings = {
@@ -149,36 +145,6 @@ export function subscribeToStoreSettings(
     (error) => {
       try {
         handleFirestoreError(error, OperationType.GET, path);
-      } catch (err) {
-        onError(err as Error);
-      }
-    }
-  );
-}
-
-export function subscribeToOrders(
-  userId: string,
-  isAdminUser: boolean,
-  onData: (orders: Order[]) => void,
-  onError: (error: Error) => void
-): Unsubscribe {
-  const path = 'orders';
-  const q = isAdminUser
-    ? query(collection(db, path), orderBy('createdAt', 'desc'))
-    : query(collection(db, path), where('userId', '==', userId), orderBy('createdAt', 'desc'));
-
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      const list = snapshot.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Order)
-      }));
-      onData(list);
-    },
-    (error) => {
-      try {
-        handleFirestoreError(error, OperationType.LIST, path);
       } catch (err) {
         onError(err as Error);
       }
@@ -421,59 +387,5 @@ export async function saveStoreSettingsInDb(settings: StoreSettings): Promise<vo
     });
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
-  }
-}
-
-export async function createOrderInDb(order: Omit<Order, 'id' | 'userId' | 'status' | 'createdAt' | 'updatedAt'>): Promise<string> {
-  const currentUser = auth.currentUser ?? (await signInAnonymously(auth)).user;
-  const orderId = sanitizeId(`${order.orderNumber}-${Date.now()}`);
-  const path = `orders/${orderId}`;
-
-  try {
-    await setDoc(doc(db, 'orders', orderId), {
-      orderNumber: order.orderNumber.slice(0, 64),
-      userId: currentUser.uid,
-      firstName: order.firstName.trim().slice(0, 80),
-      lastName: order.lastName.trim().slice(0, 80),
-      email: order.email.trim().slice(0, 160),
-      phone: order.phone.trim().slice(0, 30),
-      address: order.address.trim().slice(0, 240),
-      city: order.city.trim().slice(0, 80),
-      postalCode: order.postalCode.trim().slice(0, 30),
-      country: order.country.trim().slice(0, 80),
-      paymentMethod: order.paymentMethod,
-      paymentReference: order.paymentReference.trim().slice(0, 160),
-      items: order.items.slice(0, 30),
-      subtotal: Number(order.subtotal),
-      shippingFee: Number(order.shippingFee),
-      total: Number(order.total),
-      status: 'pending',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    return orderId;
-  } catch (error) {
-    handleFirestoreError(error, OperationType.CREATE, path);
-  }
-}
-
-export async function updateOrderStatusInDb(orderId: string, status: OrderStatus): Promise<void> {
-  const path = `orders/${orderId}`;
-  try {
-    await updateDoc(doc(db, 'orders', orderId), {
-      status,
-      updatedAt: serverTimestamp()
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.UPDATE, path);
-  }
-}
-
-export async function deleteOrderFromDb(orderId: string): Promise<void> {
-  const path = `orders/${orderId}`;
-  try {
-    await deleteDoc(doc(db, 'orders', orderId));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
   }
 }

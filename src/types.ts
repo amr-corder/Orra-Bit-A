@@ -87,7 +87,6 @@ export interface OrderLineItem {
 export interface Order {
   id?: string;
   orderNumber: string;
-  userId: string;
   firstName: string;
   lastName: string;
   email: string;

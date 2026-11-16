@@ -13,9 +13,9 @@ import {
   subscribeToProducts,
   subscribeToLookbooks,
   subscribeToStoreSettings,
-  subscribeToOrders,
   initializeDatabaseWithCatalog
 } from './services/firestoreService';
+import { subscribeToOrders } from './services/supabaseOrderService';
 import {
   ActivePage,
   Product,
@@ -143,7 +143,7 @@ export default function App() {
   const authReady = firebaseAuthReady && supabaseAuthReady;
   const isAdminUser = isSupabaseAdmin || isFirebaseAdmin;
 
-  // Live Firestore Database State
+  // Live Store Data State
   const [products, setProducts] = useState<Product[]>([]);
   const [lookbooks, setLookbooks] = useState<LookbookSpread[]>([]);
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
@@ -344,28 +344,22 @@ export default function App() {
     };
   }, []);
 
-  // Real-time Orders Listener (Firebase authenticated users / admins)
+  // Real-time Orders Listener (Supabase admins only)
   useEffect(() => {
-    if (!firebaseAuthReady || !currentUser) {
+    if (!supabaseAuthReady || !isSupabaseAdmin) {
       setOrders([]);
       return;
     }
 
     const unsubOrders = subscribeToOrders(
-      currentUser.uid,
-      isFirebaseAdmin,
       (list) => {
         setOrders(list);
       },
-      (err) => {
-        if (isFirebaseAdmin) {
-          setDbError(`Failed to load orders: ${err.message}`);
-        }
-      }
+      (err) => setDbError(`Failed to load orders: ${err.message}`)
     );
 
     return () => unsubOrders();
-  }, [firebaseAuthReady, currentUser, isFirebaseAdmin]);
+  }, [supabaseAuthReady, isSupabaseAdmin]);
 
   // Auto-initialize Firestore once when verified Firebase Admin logs in and storeSettings is null
   useEffect(() => {
@@ -938,7 +932,6 @@ export default function App() {
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cart}
         storeSettings={effectiveSettings}
-        currentUser={currentUser}
         onOrderCompleted={() => setCart([])}
         language={language}
       />

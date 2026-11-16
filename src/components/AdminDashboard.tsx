@@ -41,12 +41,15 @@ import {
   createLookbookInDb,
   updateLookbookInDb,
   deleteLookbookFromDb,
-  saveStoreSettingsInDb,
-  updateOrderStatusInDb,
-  deleteOrderFromDb
+  saveStoreSettingsInDb
 } from '../services/firestoreService';
+import { updateOrderStatusInDb, deleteOrderFromDb } from '../services/supabaseOrderService';
 import { ROOT_ADMIN_EMAIL, formatFirebaseAuthError } from '../firebase';
-import { SupabaseUser, formatSupabaseAuthError } from '../utils/supabase';
+import {
+  SupabaseUser,
+  formatSupabaseAuthError,
+  isSupabaseAdminUser
+} from '../utils/supabase';
 
 interface AdminDashboardProps {
   currentUser: User | null;
@@ -2056,7 +2059,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 4: ORDERS */}
       {activeTab === 'orders' && (
         <div className="space-y-4">
-          {orders.length === 0 ? (
+          {!isSupabaseAdminUser(supabaseUser) ? (
+            <div className="py-16 text-center border border-[#E4E4E7] bg-[#F9F9F9]">
+              <p className="font-serif text-2xl text-[#0A0A0A] mb-1">Supabase Admin Sign-In Required</p>
+              <p className="text-[13px] text-[#71717A]">
+                Sign in with your authorized Supabase admin account to view and manage customer orders.
+              </p>
+            </div>
+          ) : orders.length === 0 ? (
             <div className="py-16 text-center border border-[#E4E4E7] bg-[#F9F9F9]">
               <p className="font-serif text-2xl text-[#0A0A0A] mb-1">No Orders Recorded Yet</p>
               <p className="text-[13px] text-[#71717A]">

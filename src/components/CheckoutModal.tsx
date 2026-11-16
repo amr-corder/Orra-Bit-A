@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
 import {
   Check,
   ShieldCheck,
@@ -15,7 +14,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { CartItem, PaymentMethod, StoreSettings } from '../types';
-import { createOrderInDb } from '../services/firestoreService';
+import { createOrderInDb } from '../services/supabaseOrderService';
 import {
   Language,
   STORE_STRINGS,
@@ -29,7 +28,6 @@ interface CheckoutModalProps {
   onClose: () => void;
   cartItems: CartItem[];
   storeSettings: StoreSettings;
-  currentUser: User | null;
   onOrderCompleted: () => void;
   language: Language;
 }
@@ -39,7 +37,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onClose,
   cartItems,
   storeSettings,
-  currentUser,
   onOrderCompleted,
   language
 }) => {
@@ -80,15 +77,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setSubmitError(null);
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (currentUser?.email) {
-      setFormData((prev) => ({
-        ...prev,
-        email: prev.email === 'karim@atelier-cairo.com' ? currentUser.email || prev.email : prev.email
-      }));
-    }
-  }, [currentUser]);
 
   useEffect(() => {
     if (!isOpen) return;
