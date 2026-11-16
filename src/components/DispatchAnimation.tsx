@@ -17,18 +17,14 @@ export const DispatchAnimation: React.FC<DispatchAnimationProps> = ({
 }) => {
   const [stage, setStage] = useState<DispatchStage>('loading');
   const isAr = language === 'ar';
-  const onCompleteRef = React.useRef(onComplete);
-  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     const t1 = setTimeout(() => setStage('boarding'), 1450);
     const t2 = setTimeout(() => setStage('driving'), 2450);
-    const t3 = setTimeout(() => onCompleteRef.current(), 3950);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
   }, []);
 

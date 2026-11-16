@@ -26,10 +26,6 @@ export const Footer: React.FC<FooterProps> = ({
     e.preventDefault();
     if (!newsletterEmail) return;
     setSubscribed(true);
-    setTimeout(() => {
-      setNewsletterEmail('');
-      setSubscribed(false);
-    }, 4000);
   };
 
   return (

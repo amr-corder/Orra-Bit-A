@@ -52,7 +52,7 @@ import {
   translateProduct,
   translateStoreSettings
 } from './utils/i18n';
-import { ArrowRight, Loader2, AlertCircle, Database } from 'lucide-react';
+import { ArrowRight, Loader2, AlertCircle, Database, X } from 'lucide-react';
 
 const CART_STORAGE_KEY = 'orra_bit_cart_v1';
 const WISHLIST_STORAGE_KEY = 'orra_bit_wishlist_v1';
@@ -188,19 +188,24 @@ export default function App() {
 
   // Toast notification & Bag 20s alert dot
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isToastDismissible, setIsToastDismissible] = useState(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isBagAlertActive, setIsBagAlertActive] = useState(false);
   const bagAlertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const showToast = (message: string) => {
+  const showToast = (message: string, autoDismiss = false) => {
     if (toastTimerRef.current) {
       clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = null;
     }
     setToastMessage(message);
-    toastTimerRef.current = setTimeout(() => {
-      setToastMessage(null);
-      toastTimerRef.current = null;
-    }, 12000);
+    setIsToastDismissible(!autoDismiss);
+    if (autoDismiss) {
+      toastTimerRef.current = setTimeout(() => {
+        setToastMessage(null);
+        toastTimerRef.current = null;
+      }, 12000);
+    }
   };
 
   const triggerBagAlert = () => {
@@ -439,7 +444,7 @@ export default function App() {
       }
     });
     const localizedName = translateProduct(product, language).name;
-    showToast(`${tCatalog.addedToBagToast}: ${localizedName} (${size})`);
+    showToast(`${tCatalog.addedToBagToast}: ${localizedName} (${size})`, true);
     triggerBagAlert();
   };
 
@@ -573,6 +578,22 @@ export default function App() {
           <span className="text-[12px] font-mono tracking-[0.06em] uppercase">
             {toastMessage}
           </span>
+          {isToastDismissible && (
+            <button
+              type="button"
+              onClick={() => {
+                if (toastTimerRef.current) {
+                  clearTimeout(toastTimerRef.current);
+                  toastTimerRef.current = null;
+                }
+                setToastMessage(null);
+              }}
+              className="shrink-0 p-1 text-[#FFFFFF]/70 hover:text-[#FFFFFF]"
+              aria-label={language === 'ar' ? 'إغلاق الإشعار' : 'Dismiss notification'}
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       )}
 

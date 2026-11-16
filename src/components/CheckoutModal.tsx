@@ -21,7 +21,6 @@ import {
   translateCurrency,
   translateProduct
 } from '../utils/i18n';
-import { DispatchAnimation } from './DispatchAnimation';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -68,12 +67,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState('');
   const [settledTotal, setSettledTotal] = useState(0);
-  const [showDispatchAnim, setShowDispatchAnim] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
       setStep('details');
-      setShowDispatchAnim(false);
       setSubmitError(null);
     }
   }, [isOpen]);
@@ -101,7 +98,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       navigator.clipboard.writeText(value).catch(() => {});
     }
     setCopiedField(fieldKey);
-    setTimeout(() => setCopiedField(null), 1800);
   };
 
   const handleCompleteOrder = async (e: React.FormEvent) => {
@@ -150,7 +146,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       setSettledTotal(total);
       setOrderNumber(generatedOrderNumber);
-      setShowDispatchAnim(true);
       setStep('confirmed');
       onOrderCompleted();
     } catch (err) {
@@ -200,13 +195,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
 
           {step === 'confirmed' ? (
-            showDispatchAnim ? (
-              <DispatchAnimation
-                orderNumber={orderNumber}
-                language={language}
-                onComplete={() => setShowDispatchAnim(false)}
-              />
-            ) : (
             /* Order Confirmed View */
             <div className="p-8 md:p-12 text-center max-w-xl mx-auto space-y-6 animate-in fade-in duration-300">
               <div className="w-16 h-16 border border-[#0A0A0A] mx-auto flex items-center justify-center bg-[#0A0A0A] text-[#FFFFFF]">
@@ -253,7 +241,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </button>
               </div>
             </div>
-            )
           ) : (
             /* Checkout Form & Order Summary Split */
             <div className="grid grid-cols-1 lg:grid-cols-12">

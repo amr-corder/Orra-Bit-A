@@ -38,9 +38,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     if (!product.inStockSizes.includes(size)) return;
     onQuickAdd(product, size);
     setJustAddedSize(size);
-    setTimeout(() => {
-      setJustAddedSize(null);
-    }, 1200);
   };
 
   const handleWishlistClick = (e: React.MouseEvent) => {
