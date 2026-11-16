@@ -1,0 +1,346 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A luxury hoodie product item displayed in the ORRA BIT catalog.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique product identifier slug",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the hoodie",
+          "minLength": 2,
+          "maxLength": 200
+        },
+        "sku": {
+          "type": "string",
+          "description": "Stock keeping unit identifier",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "category": {
+          "type": "string",
+          "description": "Catalog category",
+          "enum": [
+            "Signature Editions",
+            "Graphic Series",
+            "Minimalist Oversized",
+            "Earthy Tones",
+            "Deep Navy"
+          ],
+          "maxLength": 64
+        },
+        "price": {
+          "type": "number",
+          "description": "Unit price in currency"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code",
+          "maxLength": 10
+        },
+        "color": {
+          "type": "string",
+          "description": "Colorway name",
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed product description",
+          "maxLength": 2000
+        },
+        "composition": {
+          "type": "string",
+          "description": "Fabric composition details",
+          "maxLength": 300
+        },
+        "origin": {
+          "type": "string",
+          "description": "Atelier origin",
+          "maxLength": 200
+        },
+        "fit": {
+          "type": "string",
+          "description": "Fit profile",
+          "maxLength": 300
+        },
+        "care": {
+          "type": "string",
+          "description": "Care instructions",
+          "maxLength": 300
+        },
+        "images": {
+          "type": "array",
+          "description": "List of image URLs"
+        },
+        "sizes": {
+          "type": "array",
+          "description": "Available sizes"
+        },
+        "inStockSizes": {
+          "type": "array",
+          "description": "Sizes currently in stock"
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Whether product is featured"
+        },
+        "isNew": {
+          "type": "boolean",
+          "description": "Whether product is marked new edition"
+        },
+        "editorialKicker": {
+          "type": "string",
+          "description": "Optional editorial badge label",
+          "maxLength": 120
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "sku",
+        "category",
+        "price",
+        "currency",
+        "color",
+        "description",
+        "composition",
+        "origin",
+        "fit",
+        "care",
+        "images",
+        "sizes",
+        "inStockSizes",
+        "featured",
+        "isNew",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "LookbookSpread": {
+      "title": "LookbookSpread",
+      "description": "An editorial lookbook spread pairing imagery with featured hoodies.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique spread ID",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "chapter": {
+          "type": "string",
+          "description": "Chapter number string",
+          "maxLength": 20
+        },
+        "title": {
+          "type": "string",
+          "description": "Spread title",
+          "maxLength": 200
+        },
+        "quote": {
+          "type": "string",
+          "description": "Editorial quote",
+          "maxLength": 600
+        },
+        "narrative": {
+          "type": "string",
+          "description": "Editorial narrative text",
+          "maxLength": 2000
+        },
+        "primaryImage": {
+          "type": "string",
+          "description": "Primary image URL",
+          "maxLength": 500
+        },
+        "secondaryImage": {
+          "type": "string",
+          "description": "Secondary detail image URL",
+          "maxLength": 500
+        },
+        "featuredProductIds": {
+          "type": "array",
+          "description": "IDs of featured products in this spread"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "chapter",
+        "title",
+        "quote",
+        "narrative",
+        "primaryImage",
+        "secondaryImage",
+        "featuredProductIds",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Editable storefront hero, editorial banner, and payment configuration.",
+      "type": "object",
+      "properties": {
+        "heroEyebrow": { "type": "string", "maxLength": 120 },
+        "heroSeason": { "type": "string", "maxLength": 120 },
+        "heroTitle": { "type": "string", "maxLength": 120 },
+        "heroQuote": { "type": "string", "maxLength": 500 },
+        "heroDescription": { "type": "string", "maxLength": 1000 },
+        "heroLeftImage": { "type": "string", "maxLength": 500 },
+        "heroLeftLabel": { "type": "string", "maxLength": 120 },
+        "heroLeftPrice": { "type": "string", "maxLength": 40 },
+        "heroRightImage": { "type": "string", "maxLength": 500 },
+        "heroRightTitle": { "type": "string", "maxLength": 120 },
+        "heroRightDescription": { "type": "string", "maxLength": 500 },
+        "heroRightBadge": { "type": "string", "maxLength": 120 },
+        "bannerTitle": { "type": "string", "maxLength": 160 },
+        "bannerQuote": { "type": "string", "maxLength": 500 },
+        "bannerDescription": { "type": "string", "maxLength": 1000 },
+        "bannerImage": { "type": "string", "maxLength": 500 },
+        "instapayIpa": { "type": "string", "maxLength": 120 },
+        "vodafoneCashNumber": { "type": "string", "maxLength": 30 },
+        "freeShippingThreshold": { "type": "number" },
+        "shippingFee": { "type": "number" },
+        "initialized": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "heroEyebrow",
+        "heroSeason",
+        "heroTitle",
+        "heroQuote",
+        "heroDescription",
+        "heroLeftImage",
+        "heroLeftLabel",
+        "heroLeftPrice",
+        "heroRightImage",
+        "heroRightTitle",
+        "heroRightDescription",
+        "heroRightBadge",
+        "bannerTitle",
+        "bannerQuote",
+        "bannerDescription",
+        "bannerImage",
+        "instapayIpa",
+        "vodafoneCashNumber",
+        "freeShippingThreshold",
+        "shippingFee",
+        "initialized",
+        "updatedAt"
+      ]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order with payment and delivery details.",
+      "type": "object",
+      "properties": {
+        "orderNumber": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "firstName": { "type": "string", "maxLength": 80 },
+        "lastName": { "type": "string", "maxLength": 80 },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 240 },
+        "city": { "type": "string", "maxLength": 80 },
+        "postalCode": { "type": "string", "maxLength": 30 },
+        "country": { "type": "string", "maxLength": 80 },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["instapay", "vodafone-cash", "cod"],
+          "maxLength": 30
+        },
+        "paymentReference": { "type": "string", "maxLength": 160 },
+        "items": { "type": "array", "description": "Line items in the order" },
+        "subtotal": { "type": "number" },
+        "shippingFee": { "type": "number" },
+        "total": { "type": "number" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "confirmed", "shipped", "delivered", "cancelled"],
+          "maxLength": 30
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "orderNumber",
+        "userId",
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "address",
+        "city",
+        "postalCode",
+        "country",
+        "paymentMethod",
+        "paymentReference",
+        "items",
+        "subtotal",
+        "shippingFee",
+        "total",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized admin record keyed by user UID.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "role": { "type": "string", "enum": ["admin"], "maxLength": 20 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Public storefront catalog of hoodies; writable only by admins."
+    },
+    "/lookbooks/{spreadId}": {
+      "schema": { "$ref": "#/entities/LookbookSpread" },
+      "description": "Editorial lookbook spreads; publicly readable, writable only by admins."
+    },
+    "/storeSettings/{settingId}": {
+      "schema": { "$ref": "#/entities/StoreSettings" },
+      "description": "Site-wide hero, editorial banner, and payment configuration; publicly readable, writable only by admins."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders containing PII; readable/writable only by order owner or admin."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Admin role directory; readable by owner/admin, non-self-assignable."
+    }
+  }
+}

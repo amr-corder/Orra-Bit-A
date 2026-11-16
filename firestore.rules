@@ -1,0 +1,282 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isRootAdmin() {
+      return isSignedIn() && request.auth.token.email == 'maro.mahrous67@gmail.com';
+    }
+
+    function isAdmin() {
+      return isRootAdmin() || (
+        isSignedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'sku', 'category', 'price', 'currency', 'color',
+          'description', 'composition', 'origin', 'fit', 'care',
+          'images', 'sizes', 'inStockSizes', 'featured', 'isNew',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'name', 'sku', 'category', 'price', 'currency', 'color',
+          'description', 'composition', 'origin', 'fit', 'care',
+          'images', 'sizes', 'inStockSizes', 'featured', 'isNew',
+          'editorialKicker', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && isValidString(data.name, 2, 200)
+        && isValidString(data.sku, 2, 64)
+        && data.category in ['Signature Editions', 'Graphic Series', 'Minimalist Oversized', 'Earthy Tones', 'Deep Navy']
+        && (data.price is int || data.price is float) && data.price > 0 && data.price <= 1000000
+        && isValidString(data.currency, 1, 10)
+        && isValidString(data.color, 1, 80)
+        && isValidString(data.description, 1, 2000)
+        && isValidString(data.composition, 1, 300)
+        && isValidString(data.origin, 1, 200)
+        && isValidString(data.fit, 1, 300)
+        && isValidString(data.care, 1, 300)
+        && data.images is list && data.images.size() >= 1 && data.images.size() <= 10
+        && data.images[0] is string && data.images[0].size() >= 1 && data.images[0].size() <= 500
+        && data.sizes is list && data.sizes.size() >= 1 && data.sizes.size() <= 10
+        && data.sizes[0] is string && data.sizes[0].size() >= 1 && data.sizes[0].size() <= 10
+        && data.inStockSizes is list && data.inStockSizes.size() <= 10
+        && (data.inStockSizes.size() == 0 || (data.inStockSizes[0] is string && data.inStockSizes[0].size() <= 10))
+        && data.featured is bool
+        && data.isNew is bool
+        && (!('editorialKicker' in data) || (data.editorialKicker is string && data.editorialKicker.size() <= 120))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidLookbook(data) {
+      return data.keys().hasAll([
+          'id', 'chapter', 'title', 'quote', 'narrative',
+          'primaryImage', 'secondaryImage', 'featuredProductIds',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'chapter', 'title', 'quote', 'narrative',
+          'primaryImage', 'secondaryImage', 'featuredProductIds',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && isValidString(data.chapter, 1, 20)
+        && isValidString(data.title, 2, 200)
+        && isValidString(data.quote, 2, 600)
+        && isValidString(data.narrative, 2, 2000)
+        && isValidString(data.primaryImage, 5, 500)
+        && isValidString(data.secondaryImage, 5, 500)
+        && data.featuredProductIds is list && data.featuredProductIds.size() <= 10
+        && (data.featuredProductIds.size() == 0 || (data.featuredProductIds[0] is string && data.featuredProductIds[0].size() <= 128))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidStoreSettings(data) {
+      return data.keys().hasAll([
+          'heroEyebrow', 'heroSeason', 'heroTitle', 'heroQuote', 'heroDescription',
+          'heroLeftImage', 'heroLeftLabel', 'heroLeftPrice',
+          'heroRightImage', 'heroRightTitle', 'heroRightDescription', 'heroRightBadge',
+          'bannerTitle', 'bannerQuote', 'bannerDescription', 'bannerImage',
+          'instapayIpa', 'vodafoneCashNumber', 'freeShippingThreshold', 'shippingFee',
+          'initialized', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'heroEyebrow', 'heroSeason', 'heroTitle', 'heroQuote', 'heroDescription',
+          'heroLeftImage', 'heroLeftLabel', 'heroLeftPrice',
+          'heroRightImage', 'heroRightTitle', 'heroRightDescription', 'heroRightBadge',
+          'bannerTitle', 'bannerQuote', 'bannerDescription', 'bannerImage',
+          'instapayIpa', 'vodafoneCashNumber', 'freeShippingThreshold', 'shippingFee',
+          'initialized', 'updatedAt'
+        ])
+        && isValidString(data.heroEyebrow, 1, 120)
+        && isValidString(data.heroSeason, 1, 120)
+        && isValidString(data.heroTitle, 1, 120)
+        && isValidString(data.heroQuote, 1, 500)
+        && isValidString(data.heroDescription, 1, 1000)
+        && isValidString(data.heroLeftImage, 5, 500)
+        && isValidString(data.heroLeftLabel, 1, 120)
+        && isValidString(data.heroLeftPrice, 1, 40)
+        && isValidString(data.heroRightImage, 5, 500)
+        && isValidString(data.heroRightTitle, 1, 120)
+        && isValidString(data.heroRightDescription, 1, 500)
+        && isValidString(data.heroRightBadge, 1, 120)
+        && isValidString(data.bannerTitle, 1, 160)
+        && isValidString(data.bannerQuote, 1, 500)
+        && isValidString(data.bannerDescription, 1, 1000)
+        && isValidString(data.bannerImage, 5, 500)
+        && isValidString(data.instapayIpa, 3, 120)
+        && isValidString(data.vodafoneCashNumber, 5, 30)
+        && (data.freeShippingThreshold is int || data.freeShippingThreshold is float) && data.freeShippingThreshold >= 0
+        && (data.shippingFee is int || data.shippingFee is float) && data.shippingFee >= 0
+        && data.initialized is bool
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll([
+          'orderNumber', 'userId', 'firstName', 'lastName', 'email', 'phone',
+          'address', 'city', 'postalCode', 'country',
+          'paymentMethod', 'paymentReference', 'items',
+          'subtotal', 'shippingFee', 'total', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'orderNumber', 'userId', 'firstName', 'lastName', 'email', 'phone',
+          'address', 'city', 'postalCode', 'country',
+          'paymentMethod', 'paymentReference', 'items',
+          'subtotal', 'shippingFee', 'total', 'status', 'createdAt', 'updatedAt'
+        ])
+        && isValidString(data.orderNumber, 3, 64)
+        && isValidString(data.userId, 1, 128)
+        && isValidString(data.firstName, 1, 80)
+        && isValidString(data.lastName, 1, 80)
+        && isValidString(data.email, 3, 160)
+        && isValidString(data.phone, 5, 30)
+        && isValidString(data.address, 3, 240)
+        && isValidString(data.city, 1, 80)
+        && isValidString(data.postalCode, 1, 30)
+        && isValidString(data.country, 1, 80)
+        && data.paymentMethod in ['instapay', 'vodafone-cash', 'cod']
+        && isValidString(data.paymentReference, 0, 160)
+        && data.items is list && data.items.size() >= 1 && data.items.size() <= 30
+        && data.items[0] is map
+        && (data.subtotal is int || data.subtotal is float) && data.subtotal >= 0
+        && (data.shippingFee is int || data.shippingFee is float) && data.shippingFee >= 0
+        && (data.total is int || data.total is float) && data.total >= 0
+        && data.status in ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Products Catalog (Public Read, Admin Write)
+    match /products/{productId} {
+      allow get: if isValidId(productId);
+      allow list: if true;
+      allow create: if isAdmin()
+        && isValidId(productId)
+        && isValidProduct(incoming())
+        && incoming().id == productId
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(productId)
+        && isValidProduct(incoming())
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'sku', 'category', 'price', 'currency', 'color',
+          'description', 'composition', 'origin', 'fit', 'care',
+          'images', 'sizes', 'inStockSizes', 'featured', 'isNew',
+          'editorialKicker', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(productId);
+    }
+
+    // Lookbook Spreads (Public Read, Admin Write)
+    match /lookbooks/{spreadId} {
+      allow get: if isValidId(spreadId);
+      allow list: if true;
+      allow create: if isAdmin()
+        && isValidId(spreadId)
+        && isValidLookbook(incoming())
+        && incoming().id == spreadId
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(spreadId)
+        && isValidLookbook(incoming())
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'chapter', 'title', 'quote', 'narrative',
+          'primaryImage', 'secondaryImage', 'featuredProductIds', 'updatedAt'
+        ]);
+      allow delete: if isAdmin() && isValidId(spreadId);
+    }
+
+    // Storefront Settings (Public Read, Admin Write)
+    match /storeSettings/{settingId} {
+      allow get: if settingId == 'main';
+      allow list: if false;
+      allow create: if isAdmin()
+        && settingId == 'main'
+        && isValidStoreSettings(incoming())
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && settingId == 'main'
+        && isValidStoreSettings(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'heroEyebrow', 'heroSeason', 'heroTitle', 'heroQuote', 'heroDescription',
+          'heroLeftImage', 'heroLeftLabel', 'heroLeftPrice',
+          'heroRightImage', 'heroRightTitle', 'heroRightDescription', 'heroRightBadge',
+          'bannerTitle', 'bannerQuote', 'bannerDescription', 'bannerImage',
+          'instapayIpa', 'vodafoneCashNumber', 'freeShippingThreshold', 'shippingFee',
+          'initialized', 'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    // Orders (PII Protected: Owner read/create, Admin full control)
+    match /orders/{orderId} {
+      allow get: if isValidId(orderId) && isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn()
+        && isValidId(orderId)
+        && isValidOrder(incoming())
+        && incoming().userId == request.auth.uid
+        && incoming().status == 'pending'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(orderId)
+        && isValidOrder(incoming())
+        && incoming().userId == existing().userId
+        && incoming().orderNumber == existing().orderNumber
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          !(existing().status in ['delivered', 'cancelled']) || isAdmin()
+        )
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']);
+      allow delete: if isAdmin() && isValidId(orderId);
+    }
+
+    // Admin Users Directory
+    match /admins/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if isRootAdmin() && isValidId(userId);
+    }
+  }
+}
