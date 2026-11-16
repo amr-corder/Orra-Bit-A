@@ -565,7 +565,7 @@ export default function App() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[60] w-max max-w-[calc(100vw-2rem)] bg-[#0A0A0A] text-[#FFFFFF] px-5 py-3 border border-[#333] shadow-2xl flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="fixed top-20 md:top-[88px] left-1/2 -translate-x-1/2 z-[60] w-max max-w-[calc(100vw-2rem)] bg-[#0A0A0A] text-[#FFFFFF] px-5 py-3 border border-[#333] shadow-2xl flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
           <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#22C55E] animate-pulse shadow-[0_0_8px_#22C55E]" />
