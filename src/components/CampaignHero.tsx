@@ -26,14 +26,15 @@ export const CampaignHero: React.FC<CampaignHeroProps> = ({
       className="relative w-full min-h-[100vh] flex flex-col justify-between bg-[#FFFFFF] text-[#0A0A0A] border-b border-[#E4E4E7] overflow-hidden"
     >
       {/* Full 100vh Background Image Layer */}
-      <div className="hidden lg:block absolute inset-0 pointer-events-none select-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
         <img
           src={heroStripImage}
           alt=""
           aria-hidden="true"
-          className="w-full h-full object-cover object-top lg:object-[50%_15%]"
+          className="w-full h-full object-cover object-center scale-[1.15] -translate-y-[6%] lg:scale-100 lg:translate-y-0 lg:object-[50%_15%]"
           referrerPolicy="no-referrer"
         />
+        <div className="absolute inset-0 bg-[#FFFFFF]/55 lg:hidden" />
         {/* Desktop directional wash so text column stays sharp while center model stays clear */}
         <div className="hidden lg:block absolute inset-0 ltr:bg-gradient-to-r rtl:bg-gradient-to-l from-[#FFFFFF]/92 via-[#FFFFFF]/10 to-[#FFFFFF]/75" />
       </div>
