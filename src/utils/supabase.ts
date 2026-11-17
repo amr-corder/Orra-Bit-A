@@ -35,14 +35,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 
 export type { SupabaseUser, Session };
 
-const AUTHORIZED_ADMIN_EMAILS = new Set<string>([
-  ROOT_ADMIN_EMAIL.toLowerCase()
-]);
-
 /**
- * Verifies whether a Supabase authenticated user holds strict admin privileges.
- * Checks verified email status, server-controlled app_metadata role, and root admin allowlist.
- * Intentionally ignores client-editable user_metadata to prevent privilege escalation.
+ * Only the explicitly allowlisted account may access the admin dashboard.
  */
 export function isSupabaseAdminUser(user: SupabaseUser | null | undefined): boolean {
   if (!user || !user.email) return false;
@@ -52,10 +46,7 @@ export function isSupabaseAdminUser(user: SupabaseUser | null | undefined): bool
   );
   if (!isEmailConfirmed) return false;
 
-  const hasAdminAppRole = user.app_metadata?.role === 'admin';
-  const isAllowlistedEmail = AUTHORIZED_ADMIN_EMAILS.has(user.email.toLowerCase());
-
-  return hasAdminAppRole || isAllowlistedEmail;
+  return user.email.toLowerCase() === ROOT_ADMIN_EMAIL.toLowerCase();
 }
 
 export function formatSupabaseAuthError(error: unknown): string {

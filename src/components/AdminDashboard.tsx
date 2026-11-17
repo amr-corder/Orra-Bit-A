@@ -20,7 +20,8 @@ import {
   Lock,
   Mail,
   Eye,
-  EyeOff
+  EyeOff,
+  X
 } from 'lucide-react';
 import {
   Product,
@@ -49,6 +50,7 @@ import {
   deleteOrdersFromDb
 } from '../services/supabaseOrderService';
 import { ROOT_ADMIN_EMAIL, formatFirebaseAuthError } from '../firebase';
+import { uploadProductImage } from '../services/productImageService';
 import {
   SupabaseUser,
   formatSupabaseAuthError,
@@ -219,6 +221,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [productForm, setProductForm] = useState<ProductFormState>(EMPTY_PRODUCT_FORM);
   const [savingProduct, setSavingProduct] = useState(false);
+  const [uploadingProductImages, setUploadingProductImages] = useState(false);
   const [confirmDeleteProductId, setConfirmDeleteProductId] = useState<string | null>(null);
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
 
@@ -253,12 +256,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (!isProductFormOpen && !isLookbookFormOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      if (isProductFormOpen && !savingProduct) setIsProductFormOpen(false);
+      if (isProductFormOpen && !savingProduct && !uploadingProductImages) setIsProductFormOpen(false);
       if (isLookbookFormOpen && !savingLookbook) setIsLookbookFormOpen(false);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isProductFormOpen, savingProduct, isLookbookFormOpen, savingLookbook]);
+  }, [isProductFormOpen, savingProduct, uploadingProductImages, isLookbookFormOpen, savingLookbook]);
 
   const handleSupabaseLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -373,9 +376,63 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     });
   };
 
+  const handleProductImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = '';
+    if (files.length === 0) return;
+
+    const existingImages = productForm.imagesText
+      .split(/[\n,]+/)
+      .map((image) => image.trim())
+      .filter(Boolean);
+    if (existingImages.length + files.length > 10) {
+      notifyError('A product can have up to 10 images.');
+      return;
+    }
+
+    const invalidFile = files.find(
+      (file) => !file.type.startsWith('image/') || file.size > 10 * 1024 * 1024
+    );
+    if (invalidFile) {
+      notifyError('Choose image files no larger than 10 MB each.');
+      return;
+    }
+
+    setUploadingProductImages(true);
+    setFeedback(null);
+    try {
+      for (const file of files) {
+        const imageUrl = await uploadProductImage(file);
+        setProductForm((previous) => ({
+          ...previous,
+          imagesText: [...previous.imagesText.split(/[\n,]+/).filter(Boolean), imageUrl].join('\n')
+        }));
+      }
+    } catch (err) {
+      notifyError(`Failed to upload product image: ${extractFriendlyError(err)}`);
+    } finally {
+      setUploadingProductImages(false);
+    }
+  };
+
+  const handleRemoveProductImage = (imageToRemove: string) => {
+    setProductForm((previous) => ({
+      ...previous,
+      imagesText: previous.imagesText
+        .split(/[\n,]+/)
+        .map((image) => image.trim())
+        .filter((image) => image && image !== imageToRemove)
+        .join('\n')
+    }));
+  };
+
   const handleSubmitProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setFeedback(null);
+    if (uploadingProductImages) {
+      notifyError('Please wait for image uploads to finish.');
+      return;
+    }
 
     const parsedImages = productForm.imagesText
       .split(/[\n,]+/)
@@ -397,7 +454,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       return;
     }
     if (parsedImages.length === 0) {
-      notifyError('Please provide at least one valid image URL (5 to 500 characters).');
+      notifyError('Please upload at least one product image.');
+      return;
+    }
+    if (parsedImages.length > 10) {
+      notifyError('A product can have up to 10 images.');
       return;
     }
     if (productForm.sizes.length === 0) {
@@ -714,7 +775,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   autoComplete="email"
                   value={supabaseEmail}
                   onChange={(e) => setSupabaseEmail(e.target.value)}
-                  placeholder="admin@orrabit.com"
+                  placeholder={ROOT_ADMIN_EMAIL}
                   className="w-full h-11 pl-10 pr-3.5 bg-[#FFFFFF] border border-[#E4E4E7] text-[13px] font-mono text-[#0A0A0A] placeholder-[#A1A1AA] focus:outline-none focus:border-[#0A0A0A]"
                 />
               </div>
@@ -827,7 +888,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <AlertCircle size={32} className="mx-auto text-[#ba1a1a]" />
           <h2 className="font-serif text-3xl text-[#0A0A0A]">Unauthorized Account</h2>
           <p className="text-[13px] text-[#71717A] leading-[22px]">
-            Signed in as <span className="font-mono text-[#0A0A0A]">{activeEmail}</span>, however dashboard access and database management are restricted strictly to authorized admin accounts (<span className="font-mono text-[#0A0A0A]">{ROOT_ADMIN_EMAIL}</span>).
+            Signed in as <span className="font-mono text-[#0A0A0A]">{activeEmail}</span>, however dashboard access and database management are restricted strictly to <span className="font-mono text-[#0A0A0A]">{ROOT_ADMIN_EMAIL}</span>.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
@@ -1051,13 +1112,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div
                 className="fixed inset-0 bg-[#0A0A0A]/50 backdrop-blur-[4px] transition-opacity"
                 onClick={() => {
-                  if (!savingProduct) setIsProductFormOpen(false);
+                  if (!savingProduct && !uploadingProductImages) setIsProductFormOpen(false);
                 }}
               />
               <div
                 className="relative min-h-screen flex items-center justify-center p-4 md:p-6"
                 onClick={() => {
-                  if (!savingProduct) setIsProductFormOpen(false);
+                  if (!savingProduct && !uploadingProductImages) setIsProductFormOpen(false);
                 }}
               >
                 <form
@@ -1245,16 +1306,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               <div>
                 <label className="block text-[11px] font-mono uppercase text-[#71717A] mb-1">
-                  Image URLs (One URL per line) *
+                  Product Images * ({productForm.imagesText.split(/[\n,]+/).filter((image) => image.trim()).length}/10)
                 </label>
-                <textarea
-                  rows={3}
-                  required
-                  value={productForm.imagesText}
-                  onChange={(e) => setProductForm({ ...productForm, imagesText: e.target.value })}
-                  placeholder="https://cdn.shopify.com/..."
-                  className="w-full p-3 bg-[#FFFFFF] border border-[#E4E4E7] text-[12px] font-mono focus:outline-none focus:border-[#0A0A0A]"
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  disabled={savingProduct || uploadingProductImages}
+                  onChange={handleProductImageUpload}
+                  className="w-full p-3 bg-[#FFFFFF] border border-[#E4E4E7] text-[12px] disabled:opacity-50"
                 />
+                <p className="mt-1 text-[11px] text-[#71717A]">
+                  Select image files to upload. Maximum 10 images, 10 MB per image.
+                </p>
+                {uploadingProductImages && (
+                  <p className="mt-2 inline-flex items-center gap-2 text-[12px] text-[#71717A]">
+                    <Loader2 size={14} className="animate-spin" />
+                    Uploading images...
+                  </p>
+                )}
+                {productForm.imagesText.split(/[\n,]+/).map((image) => image.trim()).filter(Boolean).length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    {productForm.imagesText.split(/[\n,]+/).map((image) => image.trim()).filter(Boolean).map((image, index) => (
+                      <div key={`${image}-${index}`} className="relative w-20 h-24 border border-[#E4E4E7]">
+                        <img src={image} alt={`Product image ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          aria-label={`Remove product image ${index + 1}`}
+                          disabled={savingProduct || uploadingProductImages}
+                          onClick={() => handleRemoveProductImage(image)}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-[#0A0A0A] text-[#FFFFFF] flex items-center justify-center"
+                        >
+                          <X size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Sizes & Stock */}
@@ -1340,7 +1428,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <div className="px-6 md:px-8 py-4 border-t border-[#E4E4E7] bg-[#FFFFFF] flex items-center justify-end gap-3 shrink-0">
                     <button
                       type="button"
-                      disabled={savingProduct}
+                      disabled={savingProduct || uploadingProductImages}
                       onClick={() => setIsProductFormOpen(false)}
                       className="h-11 px-6 border border-[#E4E4E7] bg-[#FFFFFF] text-[#0A0A0A] text-[12px] font-semibold tracking-[0.08em] uppercase hover:border-[#0A0A0A] transition-colors disabled:opacity-50"
                     >
@@ -1348,7 +1436,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </button>
                     <button
                       type="submit"
-                      disabled={savingProduct}
+                      disabled={savingProduct || uploadingProductImages}
                       className="h-11 px-8 bg-[#0A0A0A] text-[#FFFFFF] text-[12px] font-semibold tracking-[0.08em] uppercase hover:bg-[#27272A] transition-colors flex items-center gap-2 disabled:opacity-50"
                     >
                       {savingProduct ? (

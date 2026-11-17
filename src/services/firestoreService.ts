@@ -8,7 +8,6 @@ import {
   query,
   orderBy,
   getDocFromServer,
-  getDoc,
   writeBatch,
   serverTimestamp,
   Unsubscribe
@@ -63,14 +62,8 @@ export function sanitizeId(raw: string): string {
 }
 
 export async function checkIsAdmin(uid: string | undefined, email: string | null | undefined, emailVerified: boolean | undefined): Promise<boolean> {
-  if (!uid || !emailVerified) return false;
-  if (email === ROOT_ADMIN_EMAIL) return true;
-  try {
-    const adminDoc = await getDoc(doc(db, 'admins', uid));
-    return adminDoc.exists();
-  } catch {
-    return false;
-  }
+  if (!uid || !email || !emailVerified) return false;
+  return email.toLowerCase() === ROOT_ADMIN_EMAIL.toLowerCase();
 }
 
 export function subscribeToProducts(

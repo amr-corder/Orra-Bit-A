@@ -5,7 +5,7 @@
 
 import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
-import { auth, googleProvider } from './firebase';
+import { auth, googleProvider, ROOT_ADMIN_EMAIL } from './firebase';
 import { supabase, SupabaseUser, isSupabaseAdminUser } from './utils/supabase';
 import {
   DEFAULT_STORE_SETTINGS,
@@ -16,6 +16,7 @@ import {
   initializeDatabaseWithCatalog
 } from './services/firestoreService';
 import { subscribeToOrders } from './services/supabaseOrderService';
+import { claimAdminSession, releaseAdminSession } from './services/adminSessionService';
 import {
   ActivePage,
   Product,
@@ -322,27 +323,50 @@ export default function App() {
 
     supabase.auth
       .getSession()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         if (!active) return;
-        const user = data.session?.user ?? null;
+        let user = data.session?.user ?? null;
+        if (isSupabaseAdminUser(user)) {
+          try {
+            const claimed = await claimAdminSession();
+            if (!claimed) {
+              throw new Error(
+                'Admin account is already active on another device. Sign out from that device first.'
+              );
+            }
+          } catch (error) {
+            await supabase.auth.signOut({ scope: 'local' });
+            user = null;
+            if (active) {
+              setDbError(
+                `Could not restore the admin session: ${error instanceof Error ? error.message : String(error)}`
+              );
+            }
+          }
+        }
+        if (!active) return;
         setSupabaseUser(user);
         setIsSupabaseAdmin(isSupabaseAdminUser(user));
         setSupabaseAuthReady(true);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!active) return;
         setSupabaseUser(null);
         setIsSupabaseAdmin(false);
         setSupabaseAuthReady(true);
+        setDbError(
+          `Could not verify the admin session: ${error instanceof Error ? error.message : String(error)}`
+        );
       });
 
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') return;
       const user = session?.user ?? null;
       setSupabaseUser(user);
       setIsSupabaseAdmin(isSupabaseAdminUser(user));
-      setSupabaseAuthReady(true);
+      if (event === 'SIGNED_OUT') setSupabaseAuthReady(true);
     });
 
     return () => {
@@ -431,6 +455,11 @@ export default function App() {
   }, [firebaseAuthReady, isFirebaseAdmin, settingsLoaded, storeSettings]);
 
   const handleSupabaseSignIn = async (email: string, password: string) => {
+    if (email.trim().toLowerCase() !== ROOT_ADMIN_EMAIL.toLowerCase()) {
+      throw new Error(`Only ${ROOT_ADMIN_EMAIL} is authorized to sign in as an admin.`);
+    }
+
+    setIsSupabaseAdmin(false);
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password
@@ -439,6 +468,21 @@ export default function App() {
       throw error;
     }
     const user = data.user ?? null;
+    if (isSupabaseAdminUser(user)) {
+      try {
+        const claimed = await claimAdminSession();
+        if (!claimed) {
+          throw new Error(
+            'Admin account is already active on another device. Sign out from that device first.'
+          );
+        }
+      } catch (sessionError) {
+        await supabase.auth.signOut({ scope: 'local' });
+        throw new Error(
+          `Could not start the admin session: ${sessionError instanceof Error ? sessionError.message : String(sessionError)}`
+        );
+      }
+    }
     setSupabaseUser(user);
     setIsSupabaseAdmin(isSupabaseAdminUser(user));
   };
@@ -448,7 +492,12 @@ export default function App() {
       return signInInFlightRef.current;
     }
     const promise = signInWithPopup(auth, googleProvider)
-      .then(() => undefined)
+      .then(async ({ user }) => {
+        if (user.email?.toLowerCase() !== ROOT_ADMIN_EMAIL.toLowerCase()) {
+          await signOut(auth);
+          throw new Error(`Only ${ROOT_ADMIN_EMAIL} is authorized to sign in as an admin.`);
+        }
+      })
       .finally(() => {
         signInInFlightRef.current = null;
       });
@@ -457,7 +506,20 @@ export default function App() {
   };
 
   const handleSignOut = async () => {
-    await Promise.allSettled([signOut(auth), supabase.auth.signOut()]);
+    if (isSupabaseAdminUser(supabaseUser)) {
+      try {
+        await releaseAdminSession();
+      } catch (error) {
+        setDbError(
+          `Could not release the admin session. You are still signed in: ${error instanceof Error ? error.message : String(error)}`
+        );
+        return;
+      }
+    }
+    await Promise.allSettled([
+      signOut(auth),
+      supabase.auth.signOut({ scope: 'local' })
+    ]);
     setSupabaseUser(null);
     setIsSupabaseAdmin(false);
     showToast(tCatalog.signedOutToast);

@@ -29,9 +29,7 @@ returns boolean
 language sql
 stable
 as $$
-  select
-    coalesce(auth.jwt() -> 'app_metadata' ->> 'role' = 'admin', false)
-    or lower(coalesce(auth.jwt() ->> 'email', '')) = 'maro.mahrous67@gmail.com';
+  select lower(coalesce(auth.jwt() ->> 'email', '')) = 'maro.mahrous67@gmail.com';
 $$;
 
 alter table public.orders enable row level security;
