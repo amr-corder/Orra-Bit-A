@@ -132,9 +132,17 @@ export const Header: React.FC<HeaderProps> = ({
                 onTogglePage('storefront');
                 onNavigateHome();
               }}
-              className="font-serif text-2xl md:text-3xl tracking-[-0.03em] font-normal text-[#0A0A0A] hover:opacity-85 transition-opacity"
+              aria-label="ORRA BIT - Home"
+              className="group inline-flex flex-col items-center justify-center gap-1 px-2 py-1 text-[#0A0A0A] transition-opacity hover:opacity-70"
             >
-              ORRA BIT
+              <span className="font-serif text-[21px] sm:text-[23px] md:text-[28px] font-normal leading-none tracking-[0.12em]">
+                ORRA BIT
+              </span>
+              <span className="flex items-center gap-1.5 text-[6px] sm:text-[7px] font-medium uppercase leading-none tracking-[0.34em] text-[#71717A]">
+                <span aria-hidden="true" className="h-px w-3 bg-current sm:w-4" />
+                <span>FASHION STORE</span>
+                <span aria-hidden="true" className="h-px w-3 bg-current sm:w-4" />
+              </span>
             </button>
           </div>
 
