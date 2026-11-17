@@ -43,7 +43,11 @@ import {
   deleteLookbookFromDb,
   saveStoreSettingsInDb
 } from '../services/firestoreService';
-import { updateOrderStatusInDb, deleteOrderFromDb } from '../services/supabaseOrderService';
+import {
+  updateOrderStatusInDb,
+  deleteOrderFromDb,
+  deleteOrdersFromDb
+} from '../services/supabaseOrderService';
 import { ROOT_ADMIN_EMAIL, formatFirebaseAuthError } from '../firebase';
 import {
   SupabaseUser,
@@ -236,6 +240,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [confirmDeleteOrderId, setConfirmDeleteOrderId] = useState<string | null>(null);
   const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [confirmDeleteAllOrders, setConfirmDeleteAllOrders] = useState(false);
+  const [deletingAllOrders, setDeletingAllOrders] = useState(false);
 
   useEffect(() => {
     if (storeSettings) {
@@ -603,6 +609,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       notifyError(`Failed to delete order: ${extractFriendlyError(err)}`);
     } finally {
       setDeletingOrderId(null);
+    }
+  };
+
+  const handleDeleteAllOrders = async () => {
+    const orderIds = orders.flatMap((order) => order.id ? [order.id] : []);
+    if (orderIds.length !== orders.length) {
+      notifyError('Unable to delete all orders because one or more orders are missing a database ID.');
+      return;
+    }
+
+    setDeletingAllOrders(true);
+    setFeedback(null);
+    try {
+      await deleteOrdersFromDb(orderIds);
+      setConfirmDeleteAllOrders(false);
+      notifySuccess(`All ${orderIds.length} orders permanently deleted from the database.`);
+    } catch (err) {
+      notifyError(`Failed to delete all orders: ${extractFriendlyError(err)}`);
+    } finally {
+      setDeletingAllOrders(false);
     }
   };
 
@@ -2061,6 +2087,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="text-[12px] text-[#71717A]">
+                  {orders.length} {orders.length === 1 ? 'order' : 'orders'}
+                </p>
+                {confirmDeleteAllOrders ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[12px] text-[#ba1a1a]">
+                      Delete all {orders.length} orders? This cannot be undone.
+                    </span>
+                    <button
+                      onClick={handleDeleteAllOrders}
+                      disabled={deletingAllOrders || Boolean(deletingOrderId) || Boolean(updatingOrderId)}
+                      className="h-9 px-3 bg-[#ba1a1a] text-[#FFFFFF] text-[11px] font-mono uppercase flex items-center gap-1.5"
+                    >
+                      {deletingAllOrders && <Loader2 size={13} className="animate-spin" />}
+                      <span>Confirm Delete All</span>
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteAllOrders(false)}
+                      disabled={deletingAllOrders}
+                      className="h-9 px-3 border border-[#E4E4E7] text-[11px] font-mono uppercase"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDeleteAllOrders(true)}
+                    disabled={deletingAllOrders || Boolean(deletingOrderId) || Boolean(updatingOrderId)}
+                    className="h-9 px-3 border border-[#ba1a1a] text-[#ba1a1a] text-[11px] font-mono uppercase flex items-center gap-1.5"
+                  >
+                    <Trash2 size={13} />
+                    <span>Delete All</span>
+                  </button>
+                )}
+              </div>
               {orders.map((order) => {
                 const orderId = order.id || order.orderNumber;
                 const isUpdating = updatingOrderId === orderId;
@@ -2087,7 +2149,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {isUpdating && <Loader2 size={14} className="animate-spin text-[#0A0A0A]" />}
                           <select
                             value={order.status}
-                            disabled={isUpdating || isDeleting}
+                            disabled={isUpdating || isDeleting || deletingAllOrders}
                             onChange={(e) =>
                               handleStatusChange(orderId, e.target.value as OrderStatus)
                             }
@@ -2105,7 +2167,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <div className="flex items-center gap-1.5">
                             <button
                               onClick={() => handleDeleteOrder(orderId, order.orderNumber)}
-                              disabled={isDeleting}
+                              disabled={isDeleting || deletingAllOrders}
                               className="h-9 px-3 bg-[#ba1a1a] text-[#FFFFFF] text-[11px] font-mono uppercase flex items-center gap-1"
                             >
                               {isDeleting && <Loader2 size={13} className="animate-spin" />}
@@ -2113,6 +2175,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             </button>
                             <button
                               onClick={() => setConfirmDeleteOrderId(null)}
+                              disabled={deletingAllOrders}
                               className="h-9 px-3 border border-[#E4E4E7] text-[11px] font-mono uppercase"
                             >
                               Cancel
@@ -2121,6 +2184,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         ) : (
                           <button
                             onClick={() => setConfirmDeleteOrderId(orderId)}
+                            disabled={deletingAllOrders}
                             className="h-9 px-3 border border-[#E4E4E7] text-[#ba1a1a] text-[11px] font-mono uppercase hover:border-[#ba1a1a] flex items-center gap-1"
                           >
                             <Trash2 size={13} />

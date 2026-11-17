@@ -132,3 +132,10 @@ export async function deleteOrderFromDb(orderId: string): Promise<void> {
   const { error } = await supabase.from('orders').delete().eq('id', orderId);
   if (error) throw new Error(error.message);
 }
+
+export async function deleteOrdersFromDb(orderIds: string[]): Promise<void> {
+  if (orderIds.length === 0) return;
+
+  const { error } = await supabase.from('orders').delete().in('id', orderIds);
+  if (error) throw new Error(error.message);
+}
