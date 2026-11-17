@@ -623,7 +623,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // 1. Auth Loading Gate
   if (!authReady) {
     return (
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-24 flex flex-col items-center justify-center text-center">
+      <div className="admin-dashboard max-w-[1440px] mx-auto px-6 md:px-12 py-24 flex flex-col items-center justify-center text-center">
         <Loader2 size={28} className="animate-spin text-[#0A0A0A] mb-4" />
         <p className="font-mono text-[12px] uppercase tracking-[0.14em] text-[#71717A]">
           Verifying Admin Session & Security Credentials...
@@ -635,7 +635,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // 2. Unauthenticated Gate
   if (!activeUser) {
     return (
-      <div className="max-w-xl mx-auto px-6 py-20">
+      <div className="admin-dashboard max-w-xl mx-auto px-6 py-20">
         <div className="border border-[#E4E4E7] bg-[#FFFFFF] p-8 md:p-10 space-y-6">
           <div className="text-center space-y-3">
             <div className="w-12 h-12 mx-auto border border-[#0A0A0A] flex items-center justify-center">
@@ -796,7 +796,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // 3. Unauthorized User Gate
   if (!isAdminUser) {
     return (
-      <div className="max-w-xl mx-auto px-6 py-20">
+      <div className="admin-dashboard max-w-xl mx-auto px-6 py-20">
         <div className="border border-[#ba1a1a] bg-[#FFFFFF] p-8 md:p-10 space-y-5 text-center">
           <AlertCircle size={32} className="mx-auto text-[#ba1a1a]" />
           <h2 className="font-serif text-3xl text-[#0A0A0A]">Unauthorized Account</h2>
@@ -825,23 +825,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // 4. Authenticated Admin Workspace
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 space-y-8">
+    <div className="admin-dashboard max-w-[1440px] mx-auto px-6 md:px-12 py-10 space-y-8">
       {/* Admin Top Header */}
       <div className="border-b border-[#E4E4E7] pb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2.5 text-[10px] font-mono uppercase tracking-[0.16em] text-[#71717A] mb-1.5">
             <span>ORRA BIT // ADMIN WORKSPACE</span>
-            <span>/</span>
-            {isFirebaseAdmin ? (
-              <span className="text-[#15803D] flex items-center gap-1.5 font-semibold">
-                <span className="w-2 h-2 bg-[#15803D] inline-block" />
-                Firestore Session Linked • Full Access
-              </span>
-            ) : (
-              <span className="text-[#B45309] flex items-center gap-1.5 font-semibold">
-                <span className="w-2 h-2 bg-[#B45309] inline-block" />
-                Firestore Session Not Linked (Read-Only)
-              </span>
+            {isFirebaseAdmin && (
+              <>
+                <span>/</span>
+                <span className="text-[#15803D] flex items-center gap-1.5 font-semibold">
+                  <span className="w-2 h-2 bg-[#15803D] inline-block" />
+                  Firestore Session Linked • Full Access
+                </span>
+              </>
             )}
           </div>
           <h1 className="font-serif text-3xl md:text-4xl text-[#0A0A0A]">
@@ -856,17 +853,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {!isFirebaseAdmin && (
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={authLoading}
-              className="h-10 px-4 border border-[#0A0A0A] bg-[#F9F9F9] text-[#0A0A0A] text-[11px] font-semibold tracking-[0.06em] uppercase hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-colors flex items-center gap-2 disabled:opacity-50"
-            >
-              {authLoading ? <Loader2 size={14} className="animate-spin" /> : <Database size={14} />}
-              <span>Link Google Firestore Session</span>
-            </button>
-          )}
           <button
             onClick={onBackToStorefront}
             className="h-10 px-4 border border-[#0A0A0A] text-[#0A0A0A] text-[11px] font-semibold tracking-[0.08em] uppercase hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-colors flex items-center gap-2"

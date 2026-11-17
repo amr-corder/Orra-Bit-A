@@ -170,6 +170,15 @@
     border-color: #000000 !important;
   }
 
+  .admin-dashboard button:not(:disabled):hover,
+  .admin-dashboard a[href]:hover {
+    color: #FFFFFF !important;
+    background-color: #000000 !important;
+    border-color: #FFFFFF !important;
+    outline: 1px solid #FFFFFF !important;
+    outline-offset: 0;
+  }
+
   .dark-theme button.lookbook-spreads-link:hover:not(:disabled),
   .dark-theme button.filter-button:hover:not(:disabled),
   .dark-theme .product-detail-modal button:hover:not(:disabled),
