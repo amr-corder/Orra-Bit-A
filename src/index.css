@@ -18,8 +18,126 @@
     padding: 0;
   }
 
+  html[data-theme="dark"],
+  html[data-theme="dark"] body {
+    color-scheme: dark;
+    background-color: #0A0A0A;
+    color: #F4F4F5;
+  }
+
   [dir="rtl"] body {
     font-family: "Cairo", var(--font-sans);
+  }
+
+  .dark-theme {
+    background-color: #0A0A0A !important;
+    color: #F4F4F5 !important;
+  }
+
+  .dark-theme [class*="bg-[#FFFFFF]"] {
+    background-color: #0A0A0A !important;
+  }
+
+  .dark-theme [class*="bg-[#FAFAFA]"],
+  .dark-theme [class*="bg-[#F9F9F9]"] {
+    background-color: #141414 !important;
+  }
+
+  .dark-theme [class*="bg-[#F4F4F5]"],
+  .dark-theme [class*="bg-[#ECECEE]"],
+  .dark-theme [class*="bg-[#E0E0E4]"] {
+    background-color: #202023 !important;
+  }
+
+  .dark-theme [class*="bg-[#FFFFFF]/55"] {
+    background-color: rgb(10 10 10 / 55%) !important;
+  }
+
+  .dark-theme [class*="bg-[#FFFFFF]/85"],
+  .dark-theme [class*="bg-[#FFFFFF]/95"],
+  .dark-theme [class*="bg-[#FAFAFA]/95"],
+  .dark-theme [class*="bg-[#F9F9F9]/95"] {
+    background-color: #141414 !important;
+  }
+
+  .dark-theme button[class*="bg-[#0A0A0A]"],
+  .dark-theme a[class*="bg-[#0A0A0A]"] {
+    background-color: #FFFFFF !important;
+    color: #0A0A0A !important;
+    border-color: #FFFFFF !important;
+  }
+
+  .dark-theme button[class*="bg-[#FFFFFF]"],
+  .dark-theme a[class*="bg-[#FFFFFF]"],
+  .dark-theme button[class~="bg-white"] {
+    background-color: #FFFFFF !important;
+    color: #0A0A0A !important;
+  }
+
+  .dark-theme button[class*="hover:bg-[#27272A]"]:hover,
+  .dark-theme a[class*="hover:bg-[#27272A]"]:hover {
+    background-color: #E4E4E7 !important;
+    color: #0A0A0A !important;
+  }
+
+  .dark-theme button[class*="hover:bg-[#0A0A0A]"]:hover,
+  .dark-theme a[class*="hover:bg-[#0A0A0A]"]:hover,
+  .dark-theme button[class*="hover:bg-white"]:hover {
+    background-color: #FFFFFF !important;
+    color: #0A0A0A !important;
+    border-color: #FFFFFF !important;
+  }
+
+  .dark-theme [class*="text-[#0A0A0A]"],
+  .dark-theme [class*="text-[#1A1C1C]"],
+  .dark-theme [class*="text-[#27272A]"] {
+    color: #F4F4F5 !important;
+  }
+
+  .dark-theme [class*="text-[#444748]"],
+  .dark-theme [class*="text-[#52525B]"] {
+    color: #D4D4D8 !important;
+  }
+
+  .dark-theme [class*="text-[#71717A]"] {
+    color: #A1A1AA !important;
+  }
+
+  .dark-theme [class*="text-[#A1A1AA]"] {
+    color: #71717A !important;
+  }
+
+  .dark-theme [class*="border-[#E4E4E7]"],
+  .dark-theme [class*="border-[#F4F4F5]"],
+  .dark-theme [class*="divide-[#E4E4E7]"] > :not(:last-child) {
+    border-color: #303034 !important;
+  }
+
+  .dark-theme [class*="border-[#0A0A0A]"] {
+    border-color: #A1A1AA !important;
+  }
+
+  .dark-theme [class*="placeholder-[#71717A]"]::placeholder,
+  .dark-theme [class*="placeholder-[#A1A1AA]"]::placeholder {
+    color: #71717A !important;
+  }
+
+  .dark-theme button.lookbook-spreads-link:hover {
+    color: #FFFFFF !important;
+    background-color: #000000 !important;
+    box-shadow: 0 0 0 2px #000000;
+  }
+
+  .dark-theme button.filter-button:hover {
+    color: #FFFFFF !important;
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+  }
+
+  .dark-theme .product-detail-modal button:hover:not(:disabled) {
+    color: #FFFFFF !important;
+    background-color: #000000 !important;
+    border-color: #000000 !important;
   }
 
   button:not(:disabled),

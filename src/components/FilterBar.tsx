@@ -46,7 +46,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               <button
                 key={category}
                 onClick={() => onSelectCategory(category)}
-                className={`h-8 px-4 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors duration-150 flex items-center justify-center border ${
+                className={`filter-button h-8 px-4 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors duration-150 flex items-center justify-center border ${
                   isActive
                     ? 'bg-[#0A0A0A] text-[#FFFFFF] border-[#0A0A0A]'
                     : 'bg-[#FFFFFF] text-[#71717A] border-[#E4E4E7] hover:text-[#0A0A0A] hover:border-[#0A0A0A]'
@@ -102,7 +102,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <div className="hidden md:flex items-center border border-[#E4E4E7]">
             <button
               onClick={() => onViewLayoutChange('grid-4')}
-              className={`w-8 h-8 flex items-center justify-center transition-colors ${
+              className={`filter-button w-8 h-8 flex items-center justify-center transition-colors ${
                 viewLayout === 'grid-4' ? 'bg-[#0A0A0A] text-[#FFFFFF]' : 'bg-[#FFFFFF] text-[#71717A] hover:text-[#0A0A0A]'
               }`}
               title={t.view4}
@@ -112,7 +112,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             </button>
             <button
               onClick={() => onViewLayoutChange('grid-3')}
-              className={`w-8 h-8 flex items-center justify-center border-l border-[#E4E4E7] transition-colors ${
+              className={`filter-button w-8 h-8 flex items-center justify-center border-l border-[#E4E4E7] transition-colors ${
                 viewLayout === 'grid-3' ? 'bg-[#0A0A0A] text-[#FFFFFF]' : 'bg-[#FFFFFF] text-[#71717A] hover:text-[#0A0A0A]'
               }`}
               title={t.view3}
@@ -122,7 +122,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             </button>
             <button
               onClick={() => onViewLayoutChange('lookbook')}
-              className={`w-8 h-8 flex items-center justify-center border-l border-[#E4E4E7] transition-colors ${
+              className={`filter-button w-8 h-8 flex items-center justify-center border-l border-[#E4E4E7] transition-colors ${
                 viewLayout === 'lookbook' ? 'bg-[#0A0A0A] text-[#FFFFFF]' : 'bg-[#FFFFFF] text-[#71717A] hover:text-[#0A0A0A]'
               }`}
               title={t.viewLookbook}

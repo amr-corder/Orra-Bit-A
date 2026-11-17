@@ -65,7 +65,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="product-detail-modal fixed inset-0 z-50 overflow-y-auto">
       {/* Semi-translucent Backdrop */}
       <div
         className="fixed inset-0 bg-[#0A0A0A]/50 backdrop-blur-[4px] transition-opacity"

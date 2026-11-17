@@ -3,10 +3,12 @@ import { ArrowDownRight } from 'lucide-react';
 import { StoreSettings } from '../types';
 import { Language, STORE_STRINGS, translateStoreSettings } from '../utils/i18n';
 import heroStripImage from '../assets/images/solo_white_bg_hero_1794794333014.jpg';
+import heroSubjectCutout from '../assets/images/solo_white_bg_hero_1794794333014_cutout.png';
 
 interface CampaignHeroProps {
   settings: StoreSettings;
   language: Language;
+  isDarkMode: boolean;
   onExploreCatalog: () => void;
   onViewLookbook: () => void;
 }
@@ -14,6 +16,7 @@ interface CampaignHeroProps {
 export const CampaignHero: React.FC<CampaignHeroProps> = ({
   settings,
   language,
+  isDarkMode,
   onExploreCatalog,
   onViewLookbook
 }) => {
@@ -28,15 +31,25 @@ export const CampaignHero: React.FC<CampaignHeroProps> = ({
       {/* Full 100vh Background Image Layer */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
         <img
-          src={heroStripImage}
+          src={isDarkMode ? heroSubjectCutout : heroStripImage}
           alt=""
           aria-hidden="true"
           className="w-full h-full object-cover object-center scale-[1.15] -translate-y-[6%] lg:scale-100 lg:translate-y-0 lg:object-[50%_15%]"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-[#FFFFFF]/55 lg:hidden" />
+        <div         className={`absolute inset-0 lg:hidden ${
+          isDarkMode
+            ? 'bg-[#0A0A0A]/55'
+            : 'bg-[#FFFFFF]/55'
+        }`} />
         {/* Desktop directional wash so text column stays sharp while center model stays clear */}
-        <div className="hidden lg:block absolute inset-0 ltr:bg-gradient-to-r rtl:bg-gradient-to-l from-[#FFFFFF]/92 via-[#FFFFFF]/10 to-[#FFFFFF]/75" />
+        <div
+          className={`hidden lg:block absolute inset-0 ltr:bg-gradient-to-r rtl:bg-gradient-to-l ${
+            isDarkMode
+              ? 'from-transparent via-transparent to-transparent'
+              : 'from-[#FFFFFF]/92 via-[#FFFFFF]/10 to-[#FFFFFF]/75'
+          }`}
+        />
       </div>
 
       <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-12 py-10 md:py-14 my-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
@@ -70,7 +83,7 @@ export const CampaignHero: React.FC<CampaignHeroProps> = ({
             </button>
             <button
               onClick={onViewLookbook}
-              className="h-12 px-8 bg-[#FFFFFF]/85 text-[#0A0A0A] border border-[#0A0A0A] text-[12px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 hover:bg-[#0A0A0A] hover:text-[#FFFFFF] flex items-center justify-center cursor-pointer"
+              className="lookbook-spreads-link h-12 px-8 bg-[#FFFFFF]/85 text-[#0A0A0A] border border-[#0A0A0A] text-[12px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 hover:bg-[#0A0A0A] hover:text-[#FFFFFF] flex items-center justify-center cursor-pointer"
             >
               {t.lookbookBtn}
             </button>

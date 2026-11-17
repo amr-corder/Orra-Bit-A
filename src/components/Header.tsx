@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Heart, ShoppingBag, Menu, Languages } from 'lucide-react';
+import { Search, Heart, ShoppingBag, Menu, Languages, Moon, Sun } from 'lucide-react';
 import { ActivePage, Category } from '../types';
 import { Language, STORE_STRINGS } from '../utils/i18n';
 
@@ -10,7 +10,9 @@ interface HeaderProps {
   activePage: ActivePage;
   isAdminUser: boolean;
   language: Language;
+  isDarkMode: boolean;
   onToggleLanguage: () => void;
+  onToggleDarkMode: () => void;
   onTogglePage: (page: ActivePage) => void;
   onOpenCart: () => void;
   onOpenWishlist: () => void;
@@ -26,7 +28,9 @@ export const Header: React.FC<HeaderProps> = ({
   isBagAlertActive = false,
   wishlistCount,
   language,
+  isDarkMode,
   onToggleLanguage,
+  onToggleDarkMode,
   onTogglePage,
   onOpenCart,
   onOpenWishlist,
@@ -136,6 +140,19 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Right Utility Actions */}
           <div className="flex items-center gap-2.5 sm:gap-4 md:gap-5">
+            <button
+              onClick={onToggleDarkMode}
+              className="p-1.5 text-[#0A0A0A] hover:opacity-70 transition-opacity"
+              aria-label={isDarkMode ? t.switchToLightMode : t.switchToDarkMode}
+              title={isDarkMode ? t.switchToLightMode : t.switchToDarkMode}
+            >
+              {isDarkMode ? (
+                <Sun size={17} strokeWidth={1.6} />
+              ) : (
+                <Moon size={17} strokeWidth={1.6} />
+              )}
+            </button>
+
             {/* Translate Site Toggle Icon */}
             <button
               onClick={onToggleLanguage}

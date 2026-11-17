@@ -289,6 +289,8 @@ export interface StorefrontCopy {
     monograph: string;
     search: string;
     bag: string;
+    switchToDarkMode: string;
+    switchToLightMode: string;
     switchLangLabel: string;
     switchLangShort: string;
     toggleMenu: string;
@@ -488,6 +490,8 @@ export interface StorefrontCopy {
     expressDesc: string;
     free: string;
     continuePayment: string;
+    loadingCheckout: string;
+    loadingPayment: string;
     editDestination: string;
     secureCheckout: string;
     deliveringTo: string;
@@ -566,6 +570,8 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       monograph: 'Monograph',
       search: 'Search',
       bag: 'Bag',
+      switchToDarkMode: 'Switch to dark mode',
+      switchToLightMode: 'Switch to light mode',
       switchLangLabel: 'Translate site to Arabic',
       switchLangShort: 'عربي',
       toggleMenu: 'Toggle navigation menu',
@@ -776,6 +782,8 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       expressDesc: '2–4 Business Days · Egypt & Worldwide',
       free: 'FREE',
       continuePayment: 'Continue to Payment',
+      loadingCheckout: 'PREPARING YOUR CHECKOUT',
+      loadingPayment: 'PREPARING PAYMENT OPTIONS',
       editDestination: 'Edit Destination',
       secureCheckout: 'SECURE CHECKOUT',
       deliveringTo: 'Delivering to:',
@@ -854,6 +862,8 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       monograph: 'المانيفستو',
       search: 'بحث',
       bag: 'الحقيبة',
+      switchToDarkMode: 'تفعيل الوضع الداكن',
+      switchToLightMode: 'تفعيل الوضع الفاتح',
       switchLangLabel: 'Switch site to English',
       switchLangShort: 'EN',
       toggleMenu: 'فتح قائمة التنقل',
@@ -1061,6 +1071,8 @@ export const STORE_STRINGS: Record<Language, StorefrontCopy> = {
       expressDesc: '2–4 أيام عمل · مصر وجميع أنحاء العالم',
       free: 'مجاني',
       continuePayment: 'المتابعة للدفع',
+      loadingCheckout: 'جارٍ تجهيز صفحة إتمام الطلب',
+      loadingPayment: 'جارٍ تجهيز خيارات الدفع',
       editDestination: 'تعديل العنوان',
       secureCheckout: 'دفع آمن',
       deliveringTo: 'التوصيل إلى:',

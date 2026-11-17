@@ -22,6 +22,7 @@ import {
   translateProduct
 } from '../utils/i18n';
 import { DispatchAnimation } from './DispatchAnimation';
+import { CheckoutLoadingOverlay } from './CheckoutLoadingOverlay';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -69,12 +70,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderNumber, setOrderNumber] = useState('');
   const [settledTotal, setSettledTotal] = useState(0);
   const [showDispatchAnim, setShowDispatchAnim] = useState(false);
+  const [isTransitioningToPayment, setIsTransitioningToPayment] = useState(false);
+  const paymentTransitionTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
       setStep('details');
       setShowDispatchAnim(false);
       setSubmitError(null);
+      setIsTransitioningToPayment(false);
+      if (paymentTransitionTimeoutRef.current) {
+        clearTimeout(paymentTransitionTimeoutRef.current);
+        paymentTransitionTimeoutRef.current = null;
+      }
     }
   }, [isOpen]);
 
@@ -88,6 +96,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  if (isTransitioningToPayment) {
+    return (
+      <CheckoutLoadingOverlay
+        message={t.loadingPayment}
+        language={language}
+      />
+    );
+  }
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const shippingFee =
@@ -263,7 +280,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      setStep('payment');
+                      setIsTransitioningToPayment(true);
+                      paymentTransitionTimeoutRef.current = setTimeout(() => {
+                        setStep('payment');
+                        setIsTransitioningToPayment(false);
+                        paymentTransitionTimeoutRef.current = null;
+                      }, 700);
                     }}
                     className="space-y-4"
                   >

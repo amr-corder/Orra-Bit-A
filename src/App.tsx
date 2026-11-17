@@ -37,6 +37,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { SearchOverlay } from './components/SearchOverlay';
 import { CheckoutModal } from './components/CheckoutModal';
+import { CheckoutLoadingOverlay } from './components/CheckoutLoadingOverlay';
 import { LookbookSection } from './components/LookbookSection';
 import { MonographModal } from './components/MonographModal';
 const AdminDashboard = lazy(() =>
@@ -56,6 +57,7 @@ import { ArrowRight, Loader2, AlertCircle, Database, X } from 'lucide-react';
 
 const CART_STORAGE_KEY = 'orra_bit_cart_v1';
 const WISHLIST_STORAGE_KEY = 'orra_bit_wishlist_v1';
+const DARK_MODE_STORAGE_KEY = 'orra_bit_dark_mode_v1';
 
 export default function App() {
   // Language State (Storefront bilingual EN/AR; Admin Dashboard remains EN/LTR)
@@ -71,6 +73,16 @@ export default function App() {
       }
     }
     return 'en';
+  });
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
+      } catch {
+        // Ignore storage errors
+      }
+    }
+    return false;
   });
 
   // Navigation Page State
@@ -124,6 +136,15 @@ export default function App() {
       document.documentElement.lang = activePage === 'dashboard' ? 'en' : language;
     }
   }, [language, activePage]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
+    try {
+      localStorage.setItem(DARK_MODE_STORAGE_KEY, String(isDarkMode));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [isDarkMode]);
 
   const handleToggleLanguage = () => {
     setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
@@ -184,7 +205,28 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const checkoutTransitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isMonographOpen, setIsMonographOpen] = useState(false);
+
+  useEffect(
+    () => () => {
+      if (checkoutTransitionTimeoutRef.current) {
+        clearTimeout(checkoutTransitionTimeoutRef.current);
+      }
+    },
+    []
+  );
+
+  const handleProceedToCheckout = () => {
+    setIsCartOpen(false);
+    setCheckoutLoading(true);
+    checkoutTransitionTimeoutRef.current = setTimeout(() => {
+      setCheckoutLoading(false);
+      setIsCheckoutOpen(true);
+      checkoutTransitionTimeoutRef.current = null;
+    }, 700);
+  };
 
   // Toast notification & Bag 20s alert dot
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -204,7 +246,7 @@ export default function App() {
       toastTimerRef.current = setTimeout(() => {
         setToastMessage(null);
         toastTimerRef.current = null;
-      }, 12000);
+      }, 7000);
     }
   };
 
@@ -472,10 +514,10 @@ export default function App() {
     setWishlist((prev) => {
       const exists = prev.some((p) => p.id === product.id);
       if (exists) {
-        showToast(`${tCatalog.removedWishlistToast}: ${localizedName}`);
+        showToast(`${tCatalog.removedWishlistToast}: ${localizedName}`, true);
         return prev.filter((p) => p.id !== product.id);
       } else {
-        showToast(`${tCatalog.savedWishlistToast}: ${localizedName}`);
+        showToast(`${tCatalog.savedWishlistToast}: ${localizedName}`, true);
         return [...prev, product];
       }
     });
@@ -566,7 +608,11 @@ export default function App() {
   const needsInitialSeed = !isLoadingDb && storeSettings === null && products.length === 0;
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] flex flex-col text-[#0A0A0A]">
+    <div
+      className={`min-h-screen flex flex-col ${
+        isDarkMode ? 'dark-theme' : 'bg-[#FFFFFF] text-[#0A0A0A]'
+      }`}
+    >
 
       {/* Toast Notification */}
       {toastMessage && (
@@ -619,6 +665,8 @@ export default function App() {
         onOpenMonograph={() => setIsMonographOpen(true)}
         language={language}
         onToggleLanguage={handleToggleLanguage}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={() => setIsDarkMode((current) => !current)}
       />
 
       {/* Global DB Error Banner */}
@@ -705,6 +753,7 @@ export default function App() {
               onExploreCatalog={scrollToCatalog}
               onViewLookbook={scrollToLookbook}
               language={language}
+              isDarkMode={isDarkMode}
             />
 
             {/* Catalog & Filter Section */}
@@ -914,10 +963,7 @@ export default function App() {
         shippingFee={effectiveSettings.shippingFee}
         onUpdateQuantity={handleUpdateCartQuantity}
         onRemoveItem={(itemId) => handleRemoveFromCart(itemId)}
-        onProceedToCheckout={() => {
-          setIsCartOpen(false);
-          setIsCheckoutOpen(true);
-        }}
+        onProceedToCheckout={handleProceedToCheckout}
         onOpenProduct={(item) => setSelectedProduct(item.product)}
         language={language}
       />
@@ -956,6 +1002,12 @@ export default function App() {
         onOrderCompleted={() => setCart([])}
         language={language}
       />
+      {checkoutLoading && (
+        <CheckoutLoadingOverlay
+          message={STORE_STRINGS[language].checkout.loadingCheckout}
+          language={language}
+        />
+      )}
 
       {/* Monograph & Philosophy Modal */}
       <MonographModal
