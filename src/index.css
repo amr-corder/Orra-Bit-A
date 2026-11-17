@@ -140,6 +140,46 @@
     border-color: #000000 !important;
   }
 
+  .dark-theme .product-detail-modal button.product-size-selected {
+    color: #0A0A0A !important;
+    background-color: #22C55E !important;
+    border-color: #22C55E !important;
+  }
+
+  .dark-theme .product-detail-modal button.product-size-selected:hover:not(:disabled) {
+    color: #0A0A0A !important;
+    background-color: #22C55E !important;
+    border-color: #22C55E !important;
+  }
+
+  .dark-theme button.payment-hover-button:hover:not(:disabled) {
+    color: #FFFFFF !important;
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+  }
+
+  .dark-theme button.receipt-hover-button:hover:not(:disabled) {
+    color: #FFFFFF !important;
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+  }
+
+  .dark-theme button.checkout-hover-button:hover:not(:disabled) {
+    color: #FFFFFF !important;
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+  }
+
+  .dark-theme button.lookbook-spreads-link:hover:not(:disabled),
+  .dark-theme button.filter-button:hover:not(:disabled),
+  .dark-theme .product-detail-modal button:hover:not(:disabled),
+  .dark-theme button.payment-hover-button:hover:not(:disabled),
+  .dark-theme button.receipt-hover-button:hover:not(:disabled),
+  .dark-theme button.checkout-hover-button:hover:not(:disabled) {
+    outline: 1px solid #FFFFFF !important;
+    outline-offset: 0;
+  }
+
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   a[href] {
@@ -214,4 +254,39 @@
 .editorial-underline:hover::after {
   transform: scaleX(1);
   transform-origin: bottom left;
+}
+
+@keyframes receipt-arrow-right {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes receipt-arrow-left {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-4px);
+  }
+}
+
+.receipt-arrow-ltr {
+  animation: receipt-arrow-right 1s ease-in-out infinite;
+}
+
+.receipt-arrow-rtl {
+  animation: receipt-arrow-left 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .receipt-arrow-ltr,
+  .receipt-arrow-rtl {
+    animation: none;
+  }
 }

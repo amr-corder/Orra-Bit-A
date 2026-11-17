@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Language } from '../utils/i18n';
 
 interface DispatchAnimationProps {
@@ -470,9 +471,19 @@ export const DispatchAnimation: React.FC<DispatchAnimationProps> = ({
       <button
         type="button"
         onClick={onComplete}
-        className="text-[11px] font-mono uppercase tracking-[0.12em] text-[#71717A] hover:text-[#0A0A0A] underline underline-offset-4 transition-colors cursor-pointer"
+        className="receipt-hover-button inline-flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-[0.12em] text-[#71717A] hover:text-[#0A0A0A] underline underline-offset-4 transition-colors cursor-pointer"
       >
-        {isAr ? 'عرض الإيصال مباشرة' : 'View Receipt Now'}
+        {isAr ? (
+          <>
+            <ArrowLeft size={14} className="receipt-arrow-rtl" />
+            <span>عرض الإيصال مباشرة</span>
+          </>
+        ) : (
+          <>
+            <ArrowRight size={14} className="receipt-arrow-ltr" />
+            <span>View Receipt Now</span>
+          </>
+        )}
       </button>
     </div>
   );

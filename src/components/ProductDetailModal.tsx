@@ -188,7 +188,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                             !inStock
                               ? 'bg-[#F4F4F5] text-[#c4c7c7] border-[#E4E4E7] line-through cursor-not-allowed'
                               : isSelected
-                              ? 'bg-[#0A0A0A] text-[#FFFFFF] border-[#0A0A0A]'
+                              ? 'product-size-selected bg-[#22C55E] text-[#0A0A0A] border-[#22C55E]'
                               : 'bg-[#FFFFFF] text-[#0A0A0A] border-[#E4E4E7] hover:border-[#0A0A0A]'
                           }`}
                         >

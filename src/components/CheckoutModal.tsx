@@ -263,7 +263,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="pt-4">
                 <button
                   onClick={onClose}
-                  className="w-full h-14 bg-[#0A0A0A] text-white text-[13px] font-semibold tracking-[0.12em] uppercase hover:bg-[#27272A] transition-colors cursor-pointer"
+                  className="receipt-hover-button w-full h-14 bg-[#0A0A0A] text-white text-[13px] font-semibold tracking-[0.12em] uppercase hover:bg-[#27272A] transition-colors cursor-pointer"
                 >
                   {t.returnArchive}
                 </button>
@@ -432,7 +432,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     <div className="pt-4">
                       <button
                         type="submit"
-                        className="w-full h-12 bg-[#0A0A0A] text-[#FFFFFF] text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-200 hover:bg-[#27272A] flex items-center justify-center gap-2"
+                        className="payment-hover-button w-full h-12 bg-[#0A0A0A] text-[#FFFFFF] text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-200 hover:bg-[#27272A] flex items-center justify-center gap-2"
                       >
                         <span>{t.continuePayment}</span>
                         <ArrowRight size={16} className="rtl:rotate-180" />
@@ -480,7 +480,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('instapay')}
-                          className="w-full p-4 flex items-center justify-between text-start"
+                          className="payment-hover-button w-full p-4 flex items-center justify-between text-start"
                         >
                           <div className="flex items-center gap-3">
                             <span
@@ -521,7 +521,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleCopy(storeSettings.instapayIpa, 'ipa')}
-                                className="h-8 px-3 border border-[#0A0A0A] text-[10px] font-mono uppercase text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-colors flex items-center gap-1.5"
+                                className="payment-hover-button h-8 px-3 border border-[#0A0A0A] text-[10px] font-mono uppercase text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-colors flex items-center gap-1.5"
                               >
                                 {copiedField === 'ipa' ? <Check size={12} /> : <Copy size={12} />}
                                 <span>{copiedField === 'ipa' ? t.copied : t.copyIpa}</span>
@@ -557,7 +557,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('vodafone-cash')}
-                          className="w-full p-4 flex items-center justify-between text-start"
+                          className="payment-hover-button w-full p-4 flex items-center justify-between text-start"
                         >
                           <div className="flex items-center gap-3">
                             <span
@@ -598,7 +598,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleCopy(storeSettings.vodafoneCashNumber, 'vf')}
-                                className="h-8 px-3 border border-[#0A0A0A] text-[10px] font-mono uppercase text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-colors flex items-center gap-1.5"
+                                className="payment-hover-button h-8 px-3 border border-[#0A0A0A] text-[10px] font-mono uppercase text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-colors flex items-center gap-1.5"
                               >
                                 {copiedField === 'vf' ? <Check size={12} /> : <Copy size={12} />}
                                 <span>{copiedField === 'vf' ? t.copied : t.copyNumber}</span>
@@ -634,7 +634,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('cod')}
-                          className="w-full p-4 flex items-center justify-between text-start"
+                          className="payment-hover-button w-full p-4 flex items-center justify-between text-start"
                         >
                           <div className="flex items-center gap-3">
                             <span
@@ -716,7 +716,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full h-12 bg-[#0A0A0A] text-[#FFFFFF] text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-200 hover:bg-[#27272A] flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="payment-hover-button w-full h-12 bg-[#0A0A0A] text-[#FFFFFF] text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-200 hover:bg-[#27272A] flex items-center justify-center gap-2 disabled:opacity-50"
                       >
                         {isSubmitting ? (
                           <>

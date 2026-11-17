@@ -250,7 +250,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               {/* Checkout Primary Button */}
               <button
                 onClick={onProceedToCheckout}
-                className="w-full h-12 bg-[#0A0A0A] text-[#FFFFFF] text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-200 hover:bg-[#27272A] flex items-center justify-center gap-2"
+                className="checkout-hover-button w-full h-12 bg-[#0A0A0A] text-[#FFFFFF] text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-200 hover:bg-[#27272A] flex items-center justify-center gap-2"
               >
                 <span>{t.proceedCheckout}</span>
                 <ArrowRight size={16} className="rtl:rotate-180" />
