@@ -375,6 +375,32 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isSupabaseAdmin) return;
+
+    const renewAdminSession = async () => {
+      try {
+        const claimed = await claimAdminSession();
+        if (claimed) return;
+
+        await supabase.auth.signOut({ scope: 'local' });
+        setSupabaseUser(null);
+        setIsSupabaseAdmin(false);
+        setDbError('Your admin session was signed out because it became active on another device.');
+      } catch (error) {
+        setDbError(
+          `Could not renew the admin session: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void renewAdminSession();
+    }, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [isSupabaseAdmin]);
+
   // Real-time Public Storefront Firestore Listeners
   useEffect(() => {
     const unsubProducts = subscribeToProducts(

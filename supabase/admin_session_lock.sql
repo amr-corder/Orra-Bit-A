@@ -35,7 +35,8 @@ begin
   on conflict (user_id) do update
     set session_id = excluded.session_id,
         locked_at = now()
-    where public.admin_session_locks.session_id = excluded.session_id;
+    where public.admin_session_locks.session_id = excluded.session_id
+      or public.admin_session_locks.locked_at < now() - interval '5 minutes';
 
   get diagnostics affected_rows = row_count;
   return affected_rows = 1;

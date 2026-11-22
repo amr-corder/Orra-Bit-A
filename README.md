@@ -31,7 +31,7 @@ Modern luxury streetwear e-commerce storefront and digital lookbook for **ORRA B
    cp .env.example .env
    ```
 
-   Ensure `firebase-applet-config.json` contains your Firebase project configuration and configure the Supabase URL and publishable key. Run [`supabase/orders.sql`](./supabase/orders.sql) in the Supabase SQL Editor to enable shared order storage and admin-only order access. Admins must sign in through Supabase with the authorized email or an `app_metadata.role` of `admin`. Checkout saves orders to Supabase without requiring Firebase sign-in.
+   Ensure `firebase-applet-config.json` contains your Firebase project configuration and configure the Supabase URL and publishable key. Run [`supabase/orders.sql`](./supabase/orders.sql) and [`supabase/admin_email_restriction.sql`](./supabase/admin_email_restriction.sql) in the Supabase SQL Editor to enable shared order storage, admin-only order access, and single-device admin sessions. Admin session locks expire after five minutes without renewal; apply the SQL script to update an existing deployment. Admins must sign in through Supabase with the authorized email or an `app_metadata.role` of `admin`. Checkout saves orders to Supabase without requiring Firebase sign-in.
 
 3. **Run the development server**
 
